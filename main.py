@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, text
 from faker import Faker
 
 load_dotenv()
@@ -12,15 +12,23 @@ DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
 
 def main():
-    # 1. Conexión a MySQL
-    DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+# 1. Conexión inicial al servidor MySQL (sin especificar la base de datos) para crearla si no existe
+    base_url = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}"
+    temp_engine = create_engine(base_url)
+    
+    with temp_engine.begin() as conn:
+        conn.execute(text(f"CREATE DATABASE IF NOT EXISTS `{DB_NAME}`;"))
+    print(f"Base de datos '{DB_NAME}' verificada o creada exitosamente.")
+
+    # 2. Conexión oficial a la base de datos ya creada
+    DATABASE_URL = f"{base_url}/{DB_NAME}"
     engine = create_engine(DATABASE_URL)
     
     metadata = MetaData()
     
     # 2. Definición de la tabla
     tabla_personas = Table(
-        "Data", 
+        "Personas_Jimmy", 
         metadata,
         Column("id", Integer, primary_key=True, autoincrement=True),
         Column("nombre", String(100)),
