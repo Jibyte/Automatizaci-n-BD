@@ -1,0 +1,6 @@
+Faker==40.43.0
+PyMySQL==1.2.3
+python-dotenv==1.2.4
+SQLAlchemy==2.1.4
+typing_extensions==4.16.0
+tzdata==2026.5
